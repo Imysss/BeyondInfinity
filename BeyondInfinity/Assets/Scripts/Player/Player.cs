@@ -10,8 +10,6 @@ public class Player : MonoBehaviour
     public PlayerInteraction interaction;
     public PlayerInventory inventory;
     
-    public Item[] items;
-    
     private void Awake()
     {
         PlayerManager.Instance.Player = this;

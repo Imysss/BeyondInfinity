@@ -122,4 +122,16 @@ public class PlayerController : MonoBehaviour
         Cursor.lockState = toggle ? CursorLockMode.None : CursorLockMode.Locked;
         canLook = !toggle;
     }
+
+    public void AddSpeed(float amount)
+    {
+        StartCoroutine(FastSpeed(amount));
+    }
+
+    private IEnumerator FastSpeed(float amount)
+    {
+        _moveSpeed += amount;
+        yield return new WaitForSeconds(10.0f);
+        _moveSpeed -= amount;
+    }
 }

@@ -5,14 +5,17 @@ using TMPro;
 using UnityEditor.Timeline.Actions;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class UI_Inventory : MonoBehaviour
 {
+    [Header("Prefab & Container")]
+    public GameObject slotPrefab;
     private GameObject inventoryWindow;
     private Transform slotContainer;
-    
-    public GameObject slotPrefab;
 
+    private List<ItemSlot> items;
+    
     private Transform dropPosition;
 
     [Header("Select Item")] 
@@ -67,8 +70,8 @@ public class UI_Inventory : MonoBehaviour
         ClearSelectItemWindow();
 
         //버튼 이벤트 연결
-        //useButton.GetComponent<Button>().onClick.AddListener(OnUseButton);
-        //dropButton.GetComponent<Button>().onClick.AddListener(OnDropButton);
+        useButton.GetComponent<Button>().onClick.AddListener(OnUseButton);
+        dropButton.GetComponent<Button>().onClick.AddListener(OnDropButton);
         //equipButton.GetComponent<Button>().onClick.AddListener(OnEquipButton);
         //unequipButton.GetComponent<Button>().onClick.AddListener(OnUnEquipButton);
     }
@@ -107,14 +110,81 @@ public class UI_Inventory : MonoBehaviour
     {
         slotContainer.DestroyChildren();
 
-        List<ItemSlot> items = inventory.items;
+        items = new List<ItemSlot>(inventory.items);
 
         foreach (var slot in items)
         {
             GameObject go = Instantiate(slotPrefab, slotContainer);
             UI_InventoryItem item = go.GetComponent<UI_InventoryItem>();
-            item.Init();
+            item.Init(this);
             item.Set(slot.item, slot.quantity);
         }
+    }
+
+    public void SelectItem(ItemData data)
+    {
+        if (data == null) return;
+        
+        selectedItem = data;
+        
+        selectedItemNameText.text = selectedItem.name;
+        selectedItemDescriptionText.text = selectedItem.description;
+        selectedStatNameText.text = string.Empty;
+        selectedStatValueText.text = string.Empty;
+        for (int i = 0; i < selectedItem.consumables.Length; i++)
+        {
+            selectedStatNameText.text += selectedItem.consumables[i].type.ToString() + "\n";
+            selectedStatValueText.text += selectedItem.consumables[i].value.ToString() + "\n";
+        }
+
+        useButton.SetActive(selectedItem.type == Define.ItemType.Consumable);
+        equipButton.SetActive(selectedItem.type == Define.ItemType.Equipable);
+        unequipButton.SetActive(selectedItem.type == Define.ItemType.Equipable);
+        dropButton.SetActive(true);
+    }
+
+    private void OnUseButton()
+    {
+        if (selectedItem.type == Define.ItemType.Consumable)
+        {
+            for (int i = 0; i < selectedItem.consumables.Length; i++)
+            {
+                switch (selectedItem.consumables[i].type)
+                {
+                    case Define.ConsumableType.Health:
+                        condition.Heal(selectedItem.consumables[i].value);
+                        break;
+                    case Define.ConsumableType.Hunger:
+                        condition.Eat(selectedItem.consumables[i].value);
+                        break;
+                    case Define.ConsumableType.Stamina:
+                        condition.AddStamina(selectedItem.consumables[i].value);
+                        break;
+                    case Define.ConsumableType.Speed:
+                        controller.AddSpeed(selectedItem.consumables[i].value);
+                        break;
+                }
+            }
+
+            RemoveSelectedItem();
+        }
+    }
+
+    private void OnDropButton()
+    {
+        ThrowItem(selectedItem);
+        RemoveSelectedItem();
+    }
+
+    private void ThrowItem(ItemData data)
+    {
+        Instantiate(data.prefab, dropPosition.position, Quaternion.Euler(Vector3.one * Random.value * 360));
+    }
+
+    private void RemoveSelectedItem()
+    {
+        if (selectedItem == null) return;
+        inventory.RemoveItem(selectedItem);
+        ClearSelectItemWindow();
     }
 }

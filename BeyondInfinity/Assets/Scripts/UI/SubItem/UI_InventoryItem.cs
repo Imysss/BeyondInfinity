@@ -17,32 +17,22 @@ public class UI_InventoryItem : MonoBehaviour
     private TextMeshProUGUI quantityText;
     private Outline outline;
 
-    private UI_Inventory uiInventory;
+    [SerializeField] private UI_Inventory uiInventory;
 
-    public void Init()
+    public void Init(UI_Inventory uiInventory)
     {
         button = button ?? GetComponent<Button>();
         iconImage = transform.Find("Icon").GetComponent<Image>();
         quantityText = transform.Find("QuantityText").GetComponent<TextMeshProUGUI>();
         outline = outline ?? GetComponent<Outline>();
-        
-        uiInventory = GetComponentInParent<UI_Inventory>();
+
+        this.uiInventory = uiInventory;
         
         button.onClick.AddListener(OnClickButton);
     }
 
-    private void OnEnable()
-    {
-        outline.enabled = equipped;
-    }
-
     public void RefreshUI()
     {
-        Debug.Log($"[Init] iconImage: {iconImage}, item: {item}");
-        if (iconImage == null)
-        {
-            Debug.Log("iconImage가 null입니다!");
-        }
         iconImage.gameObject.SetActive(true);
         iconImage.sprite = item.icon;
         quantityText.text = quantity > 1 ? quantity.ToString() : string.Empty;
@@ -70,6 +60,6 @@ public class UI_InventoryItem : MonoBehaviour
     
     private void OnClickButton()
     {
-        //uiInventory.SelectItem(index);
+        uiInventory.SelectItem(item);
     }
 }

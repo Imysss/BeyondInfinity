@@ -12,13 +12,10 @@ public class PlayerInteraction : MonoBehaviour
     private float _maxCheckDistance = 3f;
     public LayerMask layerMask;
 
-    [SerializeField] private GameObject currentInteractGameObject;
+    private GameObject currentInteractGameObject;
     private IInteractable _currentInteractable;
     
     [SerializeField] private TextMeshProUGUI promptText;
-    
-    public ItemData itemData;   //금방 획득한 아이템 데이터
-    public Action OnAddItem;    //아이템 획득 이벤트
 
     public Transform dropPosition;
     
@@ -45,7 +42,7 @@ public class PlayerInteraction : MonoBehaviour
                     currentInteractGameObject = hit.collider.gameObject;
                     if (hit.collider.TryGetComponent<IInteractable>(out _currentInteractable))
                     {
-                        SetPromptText();
+                        DisplayPromptText();
                     }
                 }
             }
@@ -58,7 +55,7 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
 
-    private void SetPromptText()
+    private void DisplayPromptText()
     {
         promptText.gameObject.SetActive(true);
         promptText.text = _currentInteractable.GetInteractPrompt();
