@@ -80,8 +80,6 @@ public class PlayerController : MonoBehaviour
             _rigid.AddForce(Vector3.up * _jumpPower, ForceMode.Impulse);   
         }
     }
-    
-
 
     private bool IsGrounded()
     {
