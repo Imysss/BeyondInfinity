@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting.Dependencies.NCalc;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -21,6 +22,8 @@ public class PlayerController : MonoBehaviour
     private float _lookSensitivity = 0.1f;
     private Vector2 _mouseDelta;
     private bool canLook = true;
+
+    public Action OnInventoryChanged;
 
     private Rigidbody _rigid;
 
@@ -41,7 +44,10 @@ public class PlayerController : MonoBehaviour
 
     private void LateUpdate()
     {
-        RotateCamera();
+        if (canLook)
+        {
+            RotateCamera();
+        }
     }
 
     private void Move()
@@ -62,6 +68,7 @@ public class PlayerController : MonoBehaviour
         transform.eulerAngles += new Vector3(0, _mouseDelta.x * _lookSensitivity, 0);
     }
 
+    #region Player Input
     private void OnMove(InputValue inputValue)
     {
         _moveDirection = inputValue.Get<Vector2>();
@@ -80,6 +87,13 @@ public class PlayerController : MonoBehaviour
             _rigid.AddForce(Vector3.up * _jumpPower, ForceMode.Impulse);   
         }
     }
+
+    private void OnInventory(InputValue inputValue)
+    {
+        OnInventoryChanged?.Invoke();
+        ToggleCursor();
+    }
+    #endregion
 
     private bool IsGrounded()
     {
@@ -100,5 +114,12 @@ public class PlayerController : MonoBehaviour
         }
 
         return false;
+    }
+
+    private void ToggleCursor()
+    {
+        bool toggle = Cursor.lockState == CursorLockMode.Locked;
+        Cursor.lockState = toggle ? CursorLockMode.None : CursorLockMode.Locked;
+        canLook = !toggle;
     }
 }

@@ -9,6 +9,8 @@ public class Player : MonoBehaviour
     public PlayerCondition condition;
     public PlayerInteraction interaction;
     
+    public Item[] items;
+    
     private void Awake()
     {
         PlayerManager.Instance.Player = this;
