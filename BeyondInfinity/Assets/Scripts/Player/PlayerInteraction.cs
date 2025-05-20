@@ -43,8 +43,10 @@ public class PlayerInteraction : MonoBehaviour
                 if (hit.collider.gameObject != currentInteractGameObject)
                 {
                     currentInteractGameObject = hit.collider.gameObject;
-                    if(hit.collider.TryGetComponent(IInteractable, out _currentInteractable));
-                    SetPromptText();
+                    if (hit.collider.TryGetComponent<IInteractable>(out _currentInteractable))
+                    {
+                        SetPromptText();
+                    }
                 }
             }
             else

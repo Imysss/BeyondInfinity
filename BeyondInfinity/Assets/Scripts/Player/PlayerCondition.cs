@@ -11,9 +11,9 @@ public class PlayerCondition : MonoBehaviour, IDamageable
 {
     public UI_Condition uiCondition;
     
-    Condition health { get { return uiCondition.Health; } }
-    Condition hunger { get { return uiCondition.Hunger; } }
-    Condition stamina { get { return uiCondition.Stamina; } }
+    UI_ConditionItem health { get { return uiCondition.Health; } }
+    UI_ConditionItem hunger { get { return uiCondition.Hunger; } }
+    UI_ConditionItem stamina { get { return uiCondition.Stamina; } }
 
     private float _noHungerHealthDecay = 2f;    //배고픔이 0이 되면 줄어들 체력의 수
 

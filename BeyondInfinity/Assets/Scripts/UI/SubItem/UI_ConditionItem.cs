@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Condition : MonoBehaviour
+public class UI_ConditionItem : MonoBehaviour
 {
     public float currentValue;
     public float startValue;
