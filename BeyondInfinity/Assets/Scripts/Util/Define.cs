@@ -1,0 +1,20 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Define
+{
+    public enum ItemType
+    {
+        Equipable,
+        Consumable,
+    }
+
+    public enum ConsumableType
+    {
+        Hunger,
+        Health,
+        Stamina,
+    }
+}
