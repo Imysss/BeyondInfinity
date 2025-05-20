@@ -15,8 +15,8 @@ MonoBehaviour:
   name: "\uC0AC\uACFC"
   description: "\uBC30\uACE0\uD514\uACFC \uC2A4\uD0DC\uBBF8\uB108\uB97C \uD68C\uBCF5\uD569\uB2C8\uB2E4."
   type: 1
-  icon: {fileID: 0}
-  prefab: {fileID: 0}
+  icon: {fileID: 21300000, guid: e12e1a0e4a7453c42932e826264d0473, type: 3}
+  prefab: {fileID: 4942380939157310516, guid: 8fe63eb7d8210c34bbc95a66e98c1ea0, type: 3}
   stackable: 1
   maxStackAmount: 12
   consumables:

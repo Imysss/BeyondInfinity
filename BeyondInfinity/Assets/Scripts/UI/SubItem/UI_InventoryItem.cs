@@ -8,13 +8,10 @@ using UnityEngine.UI;
 public class UI_InventoryItem : MonoBehaviour
 {
     private ItemData item;
-    public ItemData Item { get { return item; } }
-
     private int index;
     private bool equipped;
     private int quantity;
-    public int Quantity { get { return quantity; } set { quantity = value; } }
-    
+ 
     private Button button;
     private Image iconImage;
     private TextMeshProUGUI quantityText;
@@ -22,12 +19,12 @@ public class UI_InventoryItem : MonoBehaviour
 
     private UI_Inventory uiInventory;
 
-    private void Awake()
+    public void Init()
     {
-        button = GetComponent<Button>();
-        iconImage = GetComponentInChildren<Image>();
-        quantityText = GetComponentInChildren<TextMeshProUGUI>();
-        outline = GetComponent<Outline>();
+        button = button ?? GetComponent<Button>();
+        iconImage = transform.Find("Icon").GetComponent<Image>();
+        quantityText = transform.Find("QuantityText").GetComponent<TextMeshProUGUI>();
+        outline = outline ?? GetComponent<Outline>();
         
         uiInventory = GetComponentInParent<UI_Inventory>();
         
@@ -39,8 +36,13 @@ public class UI_InventoryItem : MonoBehaviour
         outline.enabled = equipped;
     }
 
-    public void Init()
+    public void RefreshUI()
     {
+        Debug.Log($"[Init] iconImage: {iconImage}, item: {item}");
+        if (iconImage == null)
+        {
+            Debug.Log("iconImage가 null입니다!");
+        }
         iconImage.gameObject.SetActive(true);
         iconImage.sprite = item.icon;
         quantityText.text = quantity > 1 ? quantity.ToString() : string.Empty;
@@ -51,20 +53,21 @@ public class UI_InventoryItem : MonoBehaviour
         }
     }
 
+    public void Set(ItemData data, int quantity)
+    {
+        this.item = data;
+        this.quantity = quantity;
+
+        RefreshUI();
+    }
+
     public void Clear()
     {
         item = null;
         iconImage.gameObject.SetActive(false);
         quantityText.text = string.Empty;
     }
-
-    public bool IsStackable(int amount)
-    {
-        if (quantity < amount)
-            return true;
-        return false;
-    }
-
+    
     private void OnClickButton()
     {
         //uiInventory.SelectItem(index);

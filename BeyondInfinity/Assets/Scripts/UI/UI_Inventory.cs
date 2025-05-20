@@ -8,9 +8,10 @@ using UnityEngine.UI;
 
 public class UI_Inventory : MonoBehaviour
 {
-    private UI_InventoryItem[] items;
     private GameObject inventoryWindow;
     private Transform slotContainer;
+    
+    public GameObject slotPrefab;
 
     private Transform dropPosition;
 
@@ -27,11 +28,11 @@ public class UI_Inventory : MonoBehaviour
     private PlayerController controller;
     private PlayerCondition condition;
     private PlayerInteraction interaction;
+    private PlayerInventory inventory;
 
     private ItemData selectedItem;
     private int selectedItemIndex = 0;
 
-    private int maxItemIndex = 12;
 
     private void Start()
     {
@@ -54,10 +55,11 @@ public class UI_Inventory : MonoBehaviour
         controller = PlayerManager.Instance.Player.controller;
         condition = PlayerManager.Instance.Player.condition;
         interaction = PlayerManager.Instance.Player.interaction;
+        inventory = PlayerManager.Instance.Player.inventory;
         
         //인벤토리 이벤트 연결
         controller.OnInventoryChanged += Toggle;
-        interaction.OnAddItem += AddItem;
+        inventory.OnInventoryChanged += RefreshUI;
         
         //인벤토리 UI 초기화
         inventoryWindow.SetActive(false);
@@ -65,10 +67,10 @@ public class UI_Inventory : MonoBehaviour
         ClearSelectItemWindow();
 
         //버튼 이벤트 연결
-        useButton.GetComponent<Button>().onClick.AddListener(OnUseButton);
-        dropButton.GetComponent<Button>().onClick.AddListener(OnDropButton);
-        equipButton.GetComponent<Button>().onClick.AddListener(OnEquipButton);
-        unequipButton.GetComponent<Button>().onClick.AddListener(OnUnEquipButton);
+        //useButton.GetComponent<Button>().onClick.AddListener(OnUseButton);
+        //dropButton.GetComponent<Button>().onClick.AddListener(OnDropButton);
+        //equipButton.GetComponent<Button>().onClick.AddListener(OnEquipButton);
+        //unequipButton.GetComponent<Button>().onClick.AddListener(OnUnEquipButton);
     }
 
     private void Toggle()
@@ -101,30 +103,18 @@ public class UI_Inventory : MonoBehaviour
         return inventoryWindow.activeInHierarchy;
     }
 
-    private void AddItem()
+    private void RefreshUI()
     {
-        ItemData data = interaction.itemData;
+        slotContainer.DestroyChildren();
 
-        if (data.stackable)
+        List<ItemSlot> items = inventory.items;
+
+        foreach (var slot in items)
         {
-            UI_InventoryItem itemSlot = GetItemStack(data);
-            if (itemSlot != null)
-            {
-                //itemSlot.
-            }
+            GameObject go = Instantiate(slotPrefab, slotContainer);
+            UI_InventoryItem item = go.GetComponent<UI_InventoryItem>();
+            item.Init();
+            item.Set(slot.item, slot.quantity);
         }
-    }
-
-    private UI_InventoryItem GetItemStack(ItemData data)
-    {
-        for (int i = 0; i < items.Length; i++)
-        {
-            if (items[i].Item == data && items[i].IsStackable(data.maxStackAmount))
-            {
-                return items[i];
-            }
-        }
-
-        return null;
     }
 }

@@ -8,6 +8,7 @@ public class Player : MonoBehaviour
     public PlayerController controller;
     public PlayerCondition condition;
     public PlayerInteraction interaction;
+    public PlayerInventory inventory;
     
     public Item[] items;
     
@@ -18,5 +19,6 @@ public class Player : MonoBehaviour
         controller = GetComponent<PlayerController>();
         condition = GetComponent<PlayerCondition>();
         interaction = GetComponent<PlayerInteraction>();
+        inventory = GetComponent<PlayerInventory>();
     }
 }
