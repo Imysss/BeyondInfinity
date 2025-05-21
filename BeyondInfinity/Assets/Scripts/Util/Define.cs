@@ -18,5 +18,6 @@ public class Define
         Stamina,
         Speed,
         JumpPower,
+        DoubleJump,
     }
 }

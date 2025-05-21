@@ -10,10 +10,11 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Movement")] 
     private float _moveSpeed = 5f;
+    private Vector2 _moveDirection;
     private float _jumpPower = 100f;
     private float _extraJumpPower;
     private bool _isDoubleJump;
-    private Vector2 _moveDirection;
+    private int _doubleJumpCount;
     public LayerMask groundLayerMask;
 
     [Header("Look")] 
@@ -83,9 +84,28 @@ public class PlayerController : MonoBehaviour
 
     private void OnJump(InputValue inputValue)
     {
-        if (IsGrounded() && PlayerManager.Instance.Player.condition.SubtractStamina(20f))
+        if (!PlayerManager.Instance.Player.condition.SubtractStamina(20f))
+            return;
+
+        if (_isDoubleJump)
         {
-            Jump(0f);
+            if (IsGrounded())
+            {
+                _doubleJumpCount = 1;
+                Jump(0f);
+            }
+            else if (_doubleJumpCount == 1)
+            {
+                _doubleJumpCount = 0;
+                Jump(0);
+            }
+        }
+        else
+        {
+            if (IsGrounded())
+            {
+                Jump(0f);
+            }
         }
     }
 
@@ -101,6 +121,7 @@ public class PlayerController : MonoBehaviour
         float finalJumpPower = _jumpPower + _extraJumpPower + jumpPadPower;
         _rigid.AddForce(Vector3.up * finalJumpPower, ForceMode.Impulse);   
     }
+    
 
     private bool IsGrounded()
     {
@@ -152,5 +173,17 @@ public class PlayerController : MonoBehaviour
         _jumpPower += amount;
         yield return new WaitForSeconds(10.0f);
         _jumpPower -= amount;
+    }
+
+    public void DoubleJump()
+    {
+        StartCoroutine(SetDoubleJump());
+    }
+
+    private IEnumerator SetDoubleJump()
+    {
+        _isDoubleJump = true;
+        yield return new WaitForSeconds(10.0f);
+        _isDoubleJump = false;
     }
 }

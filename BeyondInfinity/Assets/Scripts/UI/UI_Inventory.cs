@@ -166,6 +166,9 @@ public class UI_Inventory : MonoBehaviour
                     case Define.ConsumableType.JumpPower:
                         controller.AddJumpPower(selectedItem.consumables[i].value);
                         break;
+                    case Define.ConsumableType.DoubleJump:
+                        controller.DoubleJump();
+                        break;
                 }
             }
 
