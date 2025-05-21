@@ -7,9 +7,9 @@ using UnityEngine.InputSystem;
 
 public class PlayerInteraction : MonoBehaviour
 {
-    private float _checkRate = 0.05f;
+    [SerializeField] private float checkRate = 0.05f;
     private float _lastCheckTime;
-    private float _maxCheckDistance = 3f;
+    [SerializeField] private float maxCheckDistance = 3f;
     public LayerMask layerMask;
 
     private GameObject currentInteractGameObject;
@@ -28,14 +28,14 @@ public class PlayerInteraction : MonoBehaviour
 
     private void Update()
     {
-        if (Time.time - _lastCheckTime > _checkRate)
+        if (Time.time - _lastCheckTime > checkRate)
         {
             _lastCheckTime = Time.time;
 
             Ray ray = _camera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f));
             RaycastHit hit;
 
-            if (Physics.Raycast(ray, out hit, _maxCheckDistance, layerMask))
+            if (Physics.Raycast(ray, out hit, maxCheckDistance, layerMask))
             {
                 if (hit.collider.gameObject != currentInteractGameObject)
                 {
