@@ -10,26 +10,30 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Movement")] 
     private float _moveSpeed = 5f;
-    private Vector2 _moveDirection;
     private float _jumpPower = 100f;
     private float _extraJumpPower;
-    private bool _isDoubleJump;
-    private int _doubleJumpCount;
     public LayerMask groundLayerMask;
+    
+    private Rigidbody _rigid;
+    private Vector2 _moveDirection;
+    
+    [Header("Jump")]
+    private bool _isDoubleJumpEnabled;
+    private int _doubleJumpCount;
 
     [Header("Look")] 
     public Transform cameraContainer;
     private float _minXLook = -85f;
     private float _maxXLook = 85f;
-    private float _currentCameraXRotation;
     private float _lookSensitivity = 0.1f;
+
+    private float _currentCameraXRotation;
     private Vector2 _mouseDelta;
     private bool canLook = true;
-
+    
     public Action OnInventoryChanged;
 
-    private Rigidbody _rigid;
-
+    #region Unity Methods
     private void Awake()
     {
         _rigid = GetComponent<Rigidbody>();
@@ -42,7 +46,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Move();
+        HandleMovement();
     }
 
     private void LateUpdate()
@@ -52,8 +56,10 @@ public class PlayerController : MonoBehaviour
             RotateCamera();
         }
     }
+    #endregion
 
-    private void Move()
+    #region Movement & Look
+    private void HandleMovement()
     {
         Vector3 dir = transform.forward * _moveDirection.y + transform.right * _moveDirection.x;
         dir *= _moveSpeed;
@@ -66,10 +72,11 @@ public class PlayerController : MonoBehaviour
     {
         _currentCameraXRotation += _mouseDelta.y * _lookSensitivity;
         _currentCameraXRotation = Mathf.Clamp(_currentCameraXRotation, _minXLook, _maxXLook);
-        cameraContainer.localEulerAngles = new Vector3(-_currentCameraXRotation, 0, 0);
         
+        cameraContainer.localEulerAngles = new Vector3(-_currentCameraXRotation, 0, 0);
         transform.eulerAngles += new Vector3(0, _mouseDelta.x * _lookSensitivity, 0);
     }
+    #endregion
 
     #region Player Input
     private void OnMove(InputValue inputValue)
@@ -87,25 +94,15 @@ public class PlayerController : MonoBehaviour
         if (!PlayerManager.Instance.Player.condition.SubtractStamina(20f))
             return;
 
-        if (_isDoubleJump)
+        if (IsGrounded())
         {
-            if (IsGrounded())
-            {
-                _doubleJumpCount = 1;
-                Jump(0f);
-            }
-            else if (_doubleJumpCount == 1)
-            {
-                _doubleJumpCount = 0;
-                Jump(0);
-            }
+            _doubleJumpCount = 1;
+            Jump();
         }
-        else
+        else if (_isDoubleJumpEnabled && _doubleJumpCount == 1)
         {
-            if (IsGrounded())
-            {
-                Jump(0f);
-            }
+            _doubleJumpCount = 0;
+            Jump();
         }
     }
 
@@ -116,34 +113,34 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
 
-    public void Jump(float jumpPadPower)
+    #region Jump & Ground Check
+    public void Jump(float jumpPadPower = 0f)
     {
         float finalJumpPower = _jumpPower + _extraJumpPower + jumpPadPower;
         _rigid.AddForce(Vector3.up * finalJumpPower, ForceMode.Impulse);   
     }
-    
 
     private bool IsGrounded()
     {
-        Ray[] rays = new Ray[4]
+        Vector3[] offsets =
         {
-            new Ray(transform.position + (transform.forward * 0.2f) + (transform.up * 0.01f), Vector3.down),
-            new Ray(transform.position + (-transform.forward * 0.2f) + (transform.up * 0.01f), Vector3.down),
-            new Ray(transform.position + (transform.right * 0.2f) + (transform.up * 0.01f), Vector3.down),
-            new Ray(transform.position + (-transform.right * 0.2f) + (transform.up * 0.01f), Vector3.down)
+            transform.forward * 0.2f,
+            -transform.forward * 0.2f,
+            transform.right * 0.2f,
+            -transform.right * 0.2f,
         };
 
-        for (int i = 0; i < rays.Length; i++)
+        foreach (Vector3 offset in offsets)
         {
-            if (Physics.Raycast(rays[i], 0.2f, groundLayerMask))
-            {
+            Ray ray = new Ray(transform.position + offset + Vector3.up * 0.01f, Vector3.down);
+            if (Physics.Raycast(ray, 0.2f, groundLayerMask))
                 return true;
-            }
         }
 
         return false;
     }
-
+    #endregion
+    
     private void ToggleCursor()
     {
         bool toggle = Cursor.lockState == CursorLockMode.Locked;
@@ -151,39 +148,27 @@ public class PlayerController : MonoBehaviour
         canLook = !toggle;
     }
 
+    #region Power-Up
     public void AddSpeed(float amount)
     {
-        StartCoroutine(SetSpeed(amount));
-    }
-
-    private IEnumerator SetSpeed(float amount)
-    {
-        _moveSpeed += amount;
-        yield return new WaitForSeconds(10.0f);
-        _moveSpeed -= amount;
+        StartCoroutine(TemporaryModifier(() => _moveSpeed += amount, () => _moveSpeed -= amount, 10f));
     }
 
     public void AddJumpPower(float amount)
     {
-        StartCoroutine(SetJumpPower(amount));
-    }
-
-    private IEnumerator SetJumpPower(float amount)
-    {
-        _jumpPower += amount;
-        yield return new WaitForSeconds(10.0f);
-        _jumpPower -= amount;
+        StartCoroutine(TemporaryModifier(() => _jumpPower += amount, () => _jumpPower -= amount, 10f));
     }
 
     public void DoubleJump()
     {
-        StartCoroutine(SetDoubleJump());
+        StartCoroutine(TemporaryModifier(() => _isDoubleJumpEnabled = true, () => _isDoubleJumpEnabled = false, 10f));
     }
 
-    private IEnumerator SetDoubleJump()
+    private IEnumerator TemporaryModifier(Action apply, Action revert, float duration)
     {
-        _isDoubleJump = true;
-        yield return new WaitForSeconds(10.0f);
-        _isDoubleJump = false;
+        apply();
+        yield return new WaitForSeconds(duration);
+        revert();
     }
+    #endregion
 }
