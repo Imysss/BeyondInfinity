@@ -5,18 +5,6 @@ using System.Data;
 using UnityEditor.UIElements;
 using UnityEngine;
 
-[Serializable]
-public class ItemSlot
-{
-    public ItemData item;
-    public int quantity;
-
-    public ItemSlot(ItemData item, int quantity)
-    {
-        this.item = item;
-        this.quantity = quantity;
-    }
-}
 public class PlayerInventory : MonoBehaviour
 {
     public Action OnInventoryChanged;

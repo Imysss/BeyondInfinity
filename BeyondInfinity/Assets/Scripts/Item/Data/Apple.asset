@@ -20,6 +20,5 @@ MonoBehaviour:
   stackable: 1
   maxStackAmount: 12
   consumables:
-  - type: 3
-    value: 3
+  - effect: {fileID: 11400000, guid: 60ba6583e7e1ad042b0d64258abf7b5f, type: 2}
   equipPrefab: {fileID: 0}

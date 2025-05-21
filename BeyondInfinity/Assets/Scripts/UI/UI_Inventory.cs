@@ -6,6 +6,7 @@ using UnityEditor.Timeline.Actions;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
+[Serializable]
 
 public class UI_Inventory : MonoBehaviour
 {
@@ -133,8 +134,8 @@ public class UI_Inventory : MonoBehaviour
         selectedStatValueText.text = string.Empty;
         for (int i = 0; i < selectedItem.consumables.Length; i++)
         {
-            selectedStatNameText.text += selectedItem.consumables[i].type.ToString() + "\n";
-            selectedStatValueText.text += selectedItem.consumables[i].value.ToString() + "\n";
+            selectedStatNameText.text += selectedItem.consumables[i].effect.type.ToString() + "\n";
+            selectedStatValueText.text += selectedItem.consumables[i].effect.value.ToString() + "\n";
         }
 
         useButton.SetActive(selectedItem.type == Define.ItemType.Consumable);
@@ -145,35 +146,15 @@ public class UI_Inventory : MonoBehaviour
 
     private void OnUseButton()
     {
-        if (selectedItem.type == Define.ItemType.Consumable)
-        {
-            for (int i = 0; i < selectedItem.consumables.Length; i++)
-            {
-                switch (selectedItem.consumables[i].type)
-                {
-                    case Define.ConsumableType.Health:
-                        condition.Heal(selectedItem.consumables[i].value);
-                        break;
-                    case Define.ConsumableType.Hunger:
-                        condition.Eat(selectedItem.consumables[i].value);
-                        break;
-                    case Define.ConsumableType.Stamina:
-                        condition.AddStamina(selectedItem.consumables[i].value);
-                        break;
-                    case Define.ConsumableType.Speed:
-                        controller.AddSpeed(selectedItem.consumables[i].value);
-                        break;
-                    case Define.ConsumableType.JumpPower:
-                        controller.AddJumpPower(selectedItem.consumables[i].value);
-                        break;
-                    case Define.ConsumableType.DoubleJump:
-                        controller.DoubleJump();
-                        break;
-                }
-            }
+        if (selectedItem.type != Define.ItemType.Consumable)
+            return;
 
-            RemoveSelectedItem();
+        foreach (var consumable in selectedItem.consumables)
+        {
+            consumable.effect.Apply(controller, condition);
         }
+        
+        RemoveSelectedItem();
     }
 
     private void OnDropButton()

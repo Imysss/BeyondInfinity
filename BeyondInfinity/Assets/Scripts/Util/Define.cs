@@ -21,3 +21,22 @@ public class Define
         DoubleJump,
     }
 }
+
+[Serializable]
+public class ItemDataConsumable
+{
+    public ItemEffectBase effect;
+}
+
+[Serializable]
+public class ItemSlot
+{
+    public ItemData item;
+    public int quantity;
+
+    public ItemSlot(ItemData item, int quantity)
+    {
+        this.item = item;
+        this.quantity = quantity;
+    }
+}
