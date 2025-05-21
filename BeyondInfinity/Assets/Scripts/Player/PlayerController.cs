@@ -10,8 +10,9 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Movement")] 
     private float _moveSpeed = 5f;
-    private float _jumpPower = 80f;
+    private float _jumpPower = 100f;
     private float _extraJumpPower;
+    private bool _isDoubleJump;
     private Vector2 _moveDirection;
     public LayerMask groundLayerMask;
 

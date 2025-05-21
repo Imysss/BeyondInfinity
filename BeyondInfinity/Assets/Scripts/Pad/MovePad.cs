@@ -7,7 +7,7 @@ public class MovePad : MonoBehaviour
 {
     [SerializeField] private float moveSpeed;
     [SerializeField] private Vector3[] moveDestination;
-    private PlayerController controller;
+    private Rigidbody _player;
     private Rigidbody _rigid;
 
     [SerializeField] private int maxDestinationIndex;
@@ -33,13 +33,19 @@ public class MovePad : MonoBehaviour
     private void FixedUpdate()
     {
         MoveToDestination();
+    }
+
+    private void LateUpdate()
+    {
         deltaPosition = transform.position - lastPosition;
         lastPosition = transform.position;
     }
 
     private void MoveToDestination()
     {
-        transform.position = Vector3.MoveTowards(transform.position, destination, moveSpeed * Time.fixedDeltaTime);
+        Vector3 newPosition = Vector3.MoveTowards(_rigid.position, destination, moveSpeed * Time.fixedDeltaTime);
+        _rigid.MovePosition(newPosition);
+        
         if (Vector3.Distance(transform.position, destination) <= 0.01f)
         {
             SetDestination(++destinationIndex);
@@ -50,12 +56,12 @@ public class MovePad : MonoBehaviour
     {
         destination = moveDestination[index % maxDestinationIndex];
     }
-
+    
     private void OnCollisionStay(Collision other)
     {
-        if (other.gameObject.TryGetComponent(out controller))
+        if (other.gameObject.TryGetComponent(out _player))
         {
-            other.transform.position += deltaPosition;
+            _player.MovePosition(_player.position + deltaPosition);
         }
     }
 }
