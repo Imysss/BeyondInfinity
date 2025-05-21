@@ -48,9 +48,7 @@ public class PlayerInteraction : MonoBehaviour
             }
             else
             {
-                currentInteractGameObject = null;
-                _currentInteractable = null;
-                promptText.gameObject.SetActive(false);
+                ClearInteraction();
             }
         }
     }
@@ -66,9 +64,14 @@ public class PlayerInteraction : MonoBehaviour
         if (_currentInteractable != null)
         {
             _currentInteractable.Interact();
-            currentInteractGameObject = null;
-            _currentInteractable = null;
-            promptText.gameObject.SetActive(false);
+            ClearInteraction();
         }
+    }
+
+    private void ClearInteraction()
+    {
+        currentInteractGameObject = null;
+        _currentInteractable = null;
+        promptText.gameObject.SetActive(false);
     }
 }

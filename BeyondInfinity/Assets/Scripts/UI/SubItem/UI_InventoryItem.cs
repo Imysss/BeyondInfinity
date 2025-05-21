@@ -8,7 +8,6 @@ using UnityEngine.UI;
 public class UI_InventoryItem : MonoBehaviour
 {
     private ItemData item;
-    private int index;
     private bool equipped;
     private int quantity;
  
@@ -17,7 +16,7 @@ public class UI_InventoryItem : MonoBehaviour
     private TextMeshProUGUI quantityText;
     private Outline outline;
 
-    [SerializeField] private UI_Inventory uiInventory;
+    private UI_Inventory uiInventory;
 
     public void Init(UI_Inventory uiInventory)
     {
@@ -49,13 +48,6 @@ public class UI_InventoryItem : MonoBehaviour
         this.quantity = quantity;
 
         RefreshUI();
-    }
-
-    public void Clear()
-    {
-        item = null;
-        iconImage.gameObject.SetActive(false);
-        quantityText.text = string.Empty;
     }
     
     private void OnClickButton()

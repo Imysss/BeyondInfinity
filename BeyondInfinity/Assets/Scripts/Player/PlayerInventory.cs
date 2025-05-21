@@ -30,13 +30,16 @@ public class PlayerInventory : MonoBehaviour
     public void RemoveItem(ItemData data)
     {
         ItemSlot slot = items.Find(s => s.item == data);
-        if (slot != null)
+        if (slot == null)
         {
-            slot.quantity--;
-            if (slot.quantity <= 0)
-            {
-                items.Remove(slot);
-            }
+            Debug.Log($"RemoveItem: {data.name} not found in inventory");
+            return;
+        }
+
+        slot.quantity--;
+        if (slot.quantity <= 0)
+        {
+            items.Remove(slot);
         }
         
         OnInventoryChanged?.Invoke();

@@ -5608,10 +5608,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Item_Tomato
       objectReference: {fileID: 0}
-    - target: {fileID: 4942380939157310516, guid: 8fe63eb7d8210c34bbc95a66e98c1ea0, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 5560052954237107651, guid: 8fe63eb7d8210c34bbc95a66e98c1ea0, type: 3}
       propertyPath: m_LocalPosition.x
       value: 4.96
@@ -6004,10 +6000,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Item_Banana
       objectReference: {fileID: 0}
-    - target: {fileID: 4358936824357028251, guid: 5cc322a5886b3ef4ab03d078f20bd6b2, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -6313,10 +6305,6 @@ PrefabInstance:
     - target: {fileID: 7996136752388990948, guid: 974f25ba4aa3515438f85a0c1c26b338, type: 3}
       propertyPath: m_Name
       value: Item_Carrot
-      objectReference: {fileID: 0}
-    - target: {fileID: 7996136752388990948, guid: 974f25ba4aa3515438f85a0c1c26b338, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -7309,10 +7297,6 @@ PrefabInstance:
     - target: {fileID: 3041514481437590643, guid: 5458a310d0e354644ad01db352cf66e6, type: 3}
       propertyPath: m_Name
       value: Item_Apple
-      objectReference: {fileID: 0}
-    - target: {fileID: 3041514481437590643, guid: 5458a310d0e354644ad01db352cf66e6, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8903788897039064984, guid: 5458a310d0e354644ad01db352cf66e6, type: 3}
       propertyPath: m_LocalPosition.x

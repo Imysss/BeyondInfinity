@@ -45,21 +45,14 @@ public class UI_Inventory : MonoBehaviour
 
         dropPosition = PlayerManager.Instance.Player.interaction.dropPosition;
         
-        //Select Item 연결
-        selectedItemNameText = transform.Find("InfoBackground/ItemNameText").GetComponent<TextMeshProUGUI>();
-        selectedItemDescriptionText = transform.Find("InfoBackground/ItemDescriptionText").GetComponent<TextMeshProUGUI>();
-        selectedStatNameText = transform.Find("InfoBackground/StatNameText").GetComponent<TextMeshProUGUI>();
-        selectedStatValueText = transform.Find("InfoBackground/StatValueText").GetComponent<TextMeshProUGUI>();
-        useButton = transform.Find("InfoBackground/UseButton").gameObject;
-        equipButton = transform.Find("InfoBackground/EquipButton").gameObject;
-        unequipButton = transform.Find("InfoBackground/UnequipButton").gameObject;
-        dropButton = transform.Find("InfoBackground/DropButton").gameObject;
+        //Select Item 연결    
+        InitUI();
         
         //player 연결
-        controller = PlayerManager.Instance.Player.controller;
-        condition = PlayerManager.Instance.Player.condition;
-        interaction = PlayerManager.Instance.Player.interaction;
-        inventory = PlayerManager.Instance.Player.inventory;
+        BindPlayer();
+        
+        //버튼 이벤트 연결
+        BindButton();
         
         //인벤토리 이벤트 연결
         controller.OnInventoryChanged += Toggle;
@@ -69,8 +62,30 @@ public class UI_Inventory : MonoBehaviour
         inventoryWindow.SetActive(false);
         slotContainer.DestroyChildren();
         ClearSelectItemWindow();
+    }
 
-        //버튼 이벤트 연결
+    private void InitUI()
+    {
+        selectedItemNameText = transform.Find("InfoBackground/ItemNameText").GetComponent<TextMeshProUGUI>();
+        selectedItemDescriptionText = transform.Find("InfoBackground/ItemDescriptionText").GetComponent<TextMeshProUGUI>();
+        selectedStatNameText = transform.Find("InfoBackground/StatNameText").GetComponent<TextMeshProUGUI>();
+        selectedStatValueText = transform.Find("InfoBackground/StatValueText").GetComponent<TextMeshProUGUI>();
+        useButton = transform.Find("InfoBackground/UseButton").gameObject;
+        equipButton = transform.Find("InfoBackground/EquipButton").gameObject;
+        unequipButton = transform.Find("InfoBackground/UnequipButton").gameObject;
+        dropButton = transform.Find("InfoBackground/DropButton").gameObject;
+    }
+
+    private void BindPlayer()
+    {
+        controller = PlayerManager.Instance.Player.controller;
+        condition = PlayerManager.Instance.Player.condition;
+        interaction = PlayerManager.Instance.Player.interaction;
+        inventory = PlayerManager.Instance.Player.inventory;
+    }
+
+    private void BindButton()
+    {
         useButton.GetComponent<Button>().onClick.AddListener(OnUseButton);
         dropButton.GetComponent<Button>().onClick.AddListener(OnDropButton);
         //equipButton.GetComponent<Button>().onClick.AddListener(OnEquipButton);
