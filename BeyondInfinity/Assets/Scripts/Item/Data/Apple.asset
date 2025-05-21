@@ -13,17 +13,13 @@ MonoBehaviour:
   m_Name: Apple
   m_EditorClassIdentifier: 
   name: "\uC0AC\uACFC"
-  description: "\uBC30\uACE0\uD514\uACFC \uC2A4\uD0DC\uBBF8\uB108\uB97C \uD68C\uBCF5\uD569\uB2C8\uB2E4."
+  description: "\uC2A4\uD53C\uB4DC\uAC00 10\uCD08 \uB3D9\uC548 3 \uC99D\uAC00\uD569\uB2C8\uB2E4."
   type: 1
   icon: {fileID: 21300000, guid: e12e1a0e4a7453c42932e826264d0473, type: 3}
   prefab: {fileID: 4942380939157310516, guid: 8fe63eb7d8210c34bbc95a66e98c1ea0, type: 3}
   stackable: 1
   maxStackAmount: 12
   consumables:
-  - type: 0
-    value: 10
-  - type: 2
-    value: 10
   - type: 3
-    value: 10
+    value: 3
   equipPrefab: {fileID: 0}

@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour
     [Header("Movement")] 
     private float _moveSpeed = 5f;
     private float _jumpPower = 80f;
+    private float _extraJumpPower;
     private Vector2 _moveDirection;
     public LayerMask groundLayerMask;
 
@@ -81,10 +82,9 @@ public class PlayerController : MonoBehaviour
 
     private void OnJump(InputValue inputValue)
     {
-        Debug.Log("Jump");
-        if (IsGrounded())
+        if (IsGrounded() && PlayerManager.Instance.Player.condition.SubtractStamina(20f))
         {
-            _rigid.AddForce(Vector3.up * _jumpPower, ForceMode.Impulse);   
+            Jump(0f);
         }
     }
 
@@ -94,6 +94,12 @@ public class PlayerController : MonoBehaviour
         ToggleCursor();
     }
     #endregion
+
+    public void Jump(float jumpPadPower)
+    {
+        float finalJumpPower = _jumpPower + _extraJumpPower + jumpPadPower;
+        _rigid.AddForce(Vector3.up * finalJumpPower, ForceMode.Impulse);   
+    }
 
     private bool IsGrounded()
     {
@@ -125,13 +131,25 @@ public class PlayerController : MonoBehaviour
 
     public void AddSpeed(float amount)
     {
-        StartCoroutine(FastSpeed(amount));
+        StartCoroutine(SetSpeed(amount));
     }
 
-    private IEnumerator FastSpeed(float amount)
+    private IEnumerator SetSpeed(float amount)
     {
         _moveSpeed += amount;
         yield return new WaitForSeconds(10.0f);
         _moveSpeed -= amount;
+    }
+
+    public void AddJumpPower(float amount)
+    {
+        StartCoroutine(SetJumpPower(amount));
+    }
+
+    private IEnumerator SetJumpPower(float amount)
+    {
+        _jumpPower += amount;
+        yield return new WaitForSeconds(10.0f);
+        _jumpPower -= amount;
     }
 }

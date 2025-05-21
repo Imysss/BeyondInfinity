@@ -163,6 +163,9 @@ public class UI_Inventory : MonoBehaviour
                     case Define.ConsumableType.Speed:
                         controller.AddSpeed(selectedItem.consumables[i].value);
                         break;
+                    case Define.ConsumableType.JumpPower:
+                        controller.AddJumpPower(selectedItem.consumables[i].value);
+                        break;
                 }
             }
 

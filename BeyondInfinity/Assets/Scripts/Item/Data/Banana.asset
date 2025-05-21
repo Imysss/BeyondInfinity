@@ -13,14 +13,13 @@ MonoBehaviour:
   m_Name: Banana
   m_EditorClassIdentifier: 
   name: "\uBC14\uB098\uB098"
-  description: "\uCCB4\uB825 \uC2A4\uD0DC\uBBF8\uB108\uB97C \uD68C\uBCF5\uD569\uB2C8\uB2E4."
+  description: "\uC810\uD504 \uD30C\uC6CC\uAC00 10\uCD08 \uB3D9\uC548 30 \uC99D\uAC00\uD569\uB2C8\uB2E4."
   type: 1
   icon: {fileID: 21300000, guid: a5612e17f7779374da8564e7a11d823c, type: 3}
   prefab: {fileID: 4358936824357028251, guid: 5cc322a5886b3ef4ab03d078f20bd6b2, type: 3}
   stackable: 1
   maxStackAmount: 12
   consumables:
-  - type: 1
-    value: 10
-  - type: 2
-    value: 10
+  - type: 4
+    value: 30
+  equipPrefab: {fileID: 0}

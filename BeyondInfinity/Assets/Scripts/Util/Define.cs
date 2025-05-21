@@ -17,5 +17,6 @@ public class Define
         Health,
         Stamina,
         Speed,
+        JumpPower,
     }
 }
