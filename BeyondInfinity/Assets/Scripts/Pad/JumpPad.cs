@@ -5,14 +5,14 @@ using UnityEngine;
 
 public class JumpPad : MonoBehaviour
 {
-    public float _jumpPower = 50f;
+    [SerializeField] private float jumpPower = 50f;
     private PlayerController controller;
 
     private void OnCollisionEnter(Collision other)
     {
         if (other.gameObject.TryGetComponent(out controller))
         {
-            controller.Jump(_jumpPower);
+            controller.Jump(jumpPower);
         }
     }
 }
