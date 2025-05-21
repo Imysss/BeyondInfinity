@@ -91,18 +91,21 @@ public class PlayerController : MonoBehaviour
 
     private void OnJump(InputValue inputValue)
     {
-        if (!PlayerManager.Instance.Player.condition.SubtractStamina(20f))
-            return;
-
         if (IsGrounded())
         {
-            _doubleJumpCount = 1;
-            Jump();
+            if (PlayerManager.Instance.Player.condition.SubtractStamina(20f))
+            {
+                _doubleJumpCount = 1;
+                Jump();
+            }
         }
         else if (_isDoubleJumpEnabled && _doubleJumpCount == 1)
         {
-            _doubleJumpCount = 0;
-            Jump();
+            if (PlayerManager.Instance.Player.condition.SubtractStamina(20f))
+            {
+                _doubleJumpCount = 0;
+                Jump();
+            }
         }
     }
 
