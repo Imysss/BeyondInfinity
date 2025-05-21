@@ -30,6 +30,7 @@ public class PlayerController : MonoBehaviour
     private float _currentCameraXRotation;
     private Vector2 _mouseDelta;
     private bool canLook = true;
+    private CameraSwitcher _cameraSwitcher;
     
     public Action OnInventoryChanged;
 
@@ -37,6 +38,7 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         _rigid = GetComponent<Rigidbody>();
+        _cameraSwitcher = GetComponentInChildren<CameraSwitcher>();
     }
 
     private void Start()
@@ -113,6 +115,11 @@ public class PlayerController : MonoBehaviour
     {
         OnInventoryChanged?.Invoke();
         ToggleCursor();
+    }
+
+    private void OnSwitchView(InputValue inputValue)
+    {
+        _cameraSwitcher?.SwitchView();
     }
     #endregion
 

@@ -19,22 +19,18 @@ public class CameraSwitcher : MonoBehaviour
         firstPersonPivot = transform.Find("FirstPersonPivot");
         thirdPersonPivot = transform.Find("ThirdPersonPivot");
         cameraTransform = GetComponentInChildren<Camera>().transform;
-        isFirstPersonPerspective = false;
+        isFirstPersonPerspective = true;
         ChangeView();
     }
 
-    private void Update()
+    public void SwitchView()
     {
-        if (Input.GetKeyDown(KeyCode.V))
-        {
-            ChangeView();
-        }
+        isFirstPersonPerspective = !isFirstPersonPerspective;
+        ChangeView();
     }
 
     private void ChangeView()
     {
-        isFirstPersonPerspective = !isFirstPersonPerspective;
-
         Transform targetPivot = isFirstPersonPerspective ? firstPersonPivot : thirdPersonPivot;
         cameraTransform.position = targetPivot.position;
     }
