@@ -16,6 +16,8 @@ public class PlayerController : MonoBehaviour
     
     private Rigidbody _rigid;
     private Vector2 _moveDirection;
+
+    [NonSerialized] public Vector3 platformDelta = Vector3.zero;
     
     [Header("Jump")]
     private bool _isDoubleJumpEnabled;
@@ -61,13 +63,18 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region Movement & Look
+    
+    public Vector3 platformVelocity = Vector3.zero;
     private void HandleMovement()
     {
-        Vector3 dir = transform.forward * _moveDirection.y + transform.right * _moveDirection.x;
-        dir *= _moveSpeed;
-        dir.y = _rigid.velocity.y;
-        
-        _rigid.velocity = dir;
+        Vector3 inputDir = transform.forward * _moveDirection.y + transform.right * _moveDirection.x;
+        Vector3 inputVelocity = inputDir * _moveSpeed;
+
+        // Final velocity = input + platform velocity
+        _rigid.velocity = new Vector3(inputVelocity.x + platformVelocity.x, _rigid.velocity.y, inputVelocity.z + platformVelocity.z);
+
+        // 마지막에 platformVelocity 리셋
+        platformVelocity = Vector3.zero;
     }
 
     private void RotateCamera()
@@ -142,7 +149,7 @@ public class PlayerController : MonoBehaviour
 
         foreach (Vector3 offset in offsets)
         {
-            Ray ray = new Ray(transform.position + offset + Vector3.up * 0.01f, Vector3.down);
+            Ray ray = new Ray(transform.position + offset + Vector3.up * 0.1f, Vector3.down);
             if (Physics.Raycast(ray, 0.2f, groundLayerMask))
                 return true;
         }
@@ -181,4 +188,26 @@ public class PlayerController : MonoBehaviour
         revert();
     }
     #endregion
+    
+    private void OnDrawGizmosSelected()
+    {
+        if (!Application.isPlaying) return;
+
+        Vector3[] offsets =
+        {
+            transform.forward * 0.2f,
+            -transform.forward * 0.2f,
+            transform.right * 0.2f,
+            -transform.right * 0.2f,
+        };
+
+        Gizmos.color = Color.red;
+
+        foreach (Vector3 offset in offsets)
+        {
+            Vector3 origin = transform.position + offset + Vector3.up * 0.1f;
+            Vector3 direction = Vector3.down * 0.2f;
+            Gizmos.DrawRay(origin, direction);
+        }
+    }
 }

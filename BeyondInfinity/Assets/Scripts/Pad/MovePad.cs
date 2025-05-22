@@ -7,26 +7,26 @@ public class MovePad : MonoBehaviour
 {
     [SerializeField] private float moveSpeed;
     [SerializeField] private Vector3[] moveDestination;
-    private Rigidbody _player;
+    [SerializeField] private Rigidbody _player;
     private Rigidbody _rigid;
-
-    [SerializeField] private int maxDestinationIndex;
-    [SerializeField] private int destinationIndex = 0;
+    
+    [SerializeField] private int currentIndex = 0;
     private Vector3 destination;
 
+    private Vector3 platformVelocity;
+    
     private Vector3 lastPosition;
     private Vector3 deltaPosition;
 
     private void Awake()
     {
         _rigid = GetComponent<Rigidbody>();
+        _rigid.isKinematic = true;
     }
 
     private void Start()
     {
-        maxDestinationIndex = moveDestination.Length;
-        SetDestination(destinationIndex);
-
+        destination = moveDestination[currentIndex];
         lastPosition = transform.position;
     }
 
@@ -35,33 +35,26 @@ public class MovePad : MonoBehaviour
         MoveToDestination();
     }
 
-    private void LateUpdate()
+    private void MoveToDestination()
     {
         deltaPosition = transform.position - lastPosition;
         lastPosition = transform.position;
-    }
 
-    private void MoveToDestination()
-    {
-        Vector3 newPosition = Vector3.MoveTowards(_rigid.position, destination, moveSpeed * Time.fixedDeltaTime);
-        _rigid.MovePosition(newPosition);
-        
-        if (Vector3.Distance(transform.position, destination) <= 0.01f)
+        // Transform으로 직접 위치 이동
+        transform.position = Vector3.MoveTowards(transform.position, destination, moveSpeed * Time.fixedDeltaTime);
+
+        if (Vector3.Distance(transform.position, destination) < 0.01f)
         {
-            SetDestination(++destinationIndex);
+            currentIndex = (currentIndex + 1) % moveDestination.Length;
+            destination = moveDestination[currentIndex];
         }
-    }
-
-    private void SetDestination(int index)
-    {
-        destination = moveDestination[index % maxDestinationIndex];
     }
     
     private void OnCollisionStay(Collision other)
     {
         if (other.gameObject.TryGetComponent(out _player))
         {
-            _player.MovePosition(_player.position + deltaPosition);
+            _player.position += deltaPosition;
         }
     }
 }
