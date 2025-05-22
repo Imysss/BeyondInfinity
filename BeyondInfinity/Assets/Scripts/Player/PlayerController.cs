@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement")] 
+    private Define.MovementState movementState;
     private float _moveSpeed = 5f;
     private float _jumpPower = 100f;
     private float _extraJumpPower;
@@ -41,11 +42,31 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
+        movementState =  Define.MovementState.Normal;
+    }
+
+    private void Update()
+    {
+        if (Time.time - _lastCheckTime > checkRate)
+        {
+            _lastCheckTime = Time.time;
+        }
     }
 
     private void FixedUpdate()
     {
-        HandleMovement();
+        switch (movementState)
+        {
+            case Define.MovementState.Normal:
+                HandleMovement();
+                break;
+            case Define.MovementState.Climbing:
+                HandleClimbMovement();
+                break;
+            case Define.MovementState.LeavingWall:
+                HandleLeavingWallMovement();
+                break;
+        }
     }
 
     private void LateUpdate()
@@ -64,6 +85,65 @@ public class PlayerController : MonoBehaviour
         Vector3 inputVelocity = inputDir * _moveSpeed;
         
         _rigid.velocity = new Vector3(inputVelocity.x, _rigid.velocity.y, inputVelocity.z);
+
+        if (IsWallFront())
+        {
+            movementState = Define.MovementState.Climbing;
+            _rigid.useGravity = false;
+            Debug.Log("Normal > Climb");
+        }
+    }
+
+    private Vector3 climbNormal;
+    private void HandleClimbMovement()
+    {
+        _rigid.useGravity = false;
+        
+        if (!IsWallFront() && !IsGrounded())
+        {
+            movementState = Define.MovementState.LeavingWall;
+            Debug.Log("Climb > LeavingWall");
+            return;
+        }
+        
+        //월드 기준 위/아래 방향
+        Vector3 upDir = Vector3.up;
+        Vector3 sideDir = Vector3.Cross(climbNormal, Vector3.up).normalized;
+
+        Vector3 upMovement = upDir * _moveDirection.y;
+        Vector3 rightMovement = sideDir * _moveDirection.x;
+        Vector3 climbDirection = upMovement + rightMovement;
+
+        _rigid.velocity = climbDirection * _moveSpeed;
+
+        if (IsGrounded() && _moveDirection.y < 0f) 
+        {
+            movementState = Define.MovementState.Normal;
+            _rigid.useGravity = true;
+            _rigid.velocity = Vector3.zero;
+            Debug.Log("Climb > Normal");
+            return;
+        }
+    }
+
+    private void HandleLeavingWallMovement()
+    {
+        Vector3 upDir = Vector3.up;
+        Vector3 sideDir = Vector3.Cross(climbNormal, Vector3.up).normalized;
+
+        Vector3 upMovement = upDir * _moveDirection.y;
+        Vector3 rightMovement = sideDir * _moveDirection.x;
+        Vector3 climbDirection = upMovement + rightMovement;
+
+        _rigid.velocity = climbDirection * _moveSpeed;
+
+        if (IsGrounded())
+        {
+            movementState = Define.MovementState.Normal;
+            _rigid.useGravity = true;
+            _rigid.velocity=Vector3.zero;
+            Debug.Log("LeavingWall > Normal");
+        }
     }
 
     private void RotateCamera()
@@ -170,6 +250,21 @@ public class PlayerController : MonoBehaviour
         revert();
     }
     #endregion
+
+    private float checkRate = 0.05f;
+    private float _lastCheckTime;
+    private float wallCheckDistance = 0.5f;
+    public LayerMask wallLayerMask;
+    public bool canClimb;
+
+    private bool IsWallFront()
+    {
+        return Physics.Raycast(transform.position + Vector3.up, transform.forward, wallCheckDistance, wallLayerMask);
+    }
+    private bool CanClimbing()
+    {
+        return IsWallFront() && !IsGrounded();
+    }
     
     private void ToggleCursor()
     {
@@ -177,7 +272,8 @@ public class PlayerController : MonoBehaviour
         Cursor.lockState = toggle ? CursorLockMode.None : CursorLockMode.Locked;
         canLook = !toggle;
     }
-    
+
+    #region Gizmo Methods
     /*private void OnDrawGizmosSelected()
     {
         if (!Application.isPlaying) return;
@@ -199,4 +295,10 @@ public class PlayerController : MonoBehaviour
             Gizmos.DrawRay(origin, direction);
         }
     }*/
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = canClimb ? Color.green : Color.red;
+        Gizmos.DrawRay(transform.position, transform.forward * wallCheckDistance);
+    }
+    #endregion
 }

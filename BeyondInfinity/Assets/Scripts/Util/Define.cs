@@ -17,6 +17,13 @@ public class Define
         JumpPower,
         DoubleJump,
     }
+
+    public enum MovementState
+    {
+        Normal,
+        Climbing,
+        LeavingWall,
+    }
 }
 
 [Serializable]
