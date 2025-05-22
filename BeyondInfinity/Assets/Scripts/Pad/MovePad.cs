@@ -35,12 +35,15 @@ public class MovePad : MonoBehaviour
 
     private void MoveToDestination()
     {
-        deltaPosition = transform.position - lastPosition;
-        lastPosition = transform.position;
+        Vector3 nextPosition = Vector3.MoveTowards(_rigid.position, destination, moveSpeed * Time.fixedDeltaTime);
 
-        // Transform으로 직접 위치 이동
-        transform.position = Vector3.MoveTowards(transform.position, destination, moveSpeed * Time.fixedDeltaTime);
+        //이동 전 → 정확한 delta 계산
+        deltaPosition = nextPosition - _rigid.position;
 
+        //실제 이동
+        _rigid.position = nextPosition;
+        lastPosition = nextPosition;
+        
         if (Vector3.Distance(transform.position, destination) < 0.01f)
         {
             currentIndex = (currentIndex + 1) % moveDestination.Length;
