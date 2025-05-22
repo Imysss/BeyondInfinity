@@ -113,7 +113,7 @@ public class PlayerController : MonoBehaviour
         Vector3 upMovement = upDir * _moveDirection.y;
         Vector3 rightMovement = sideDir * _moveDirection.x;
         Vector3 climbDirection = upMovement + rightMovement;
-
+        
         _rigid.velocity = climbDirection * _moveSpeed;
 
         if (IsGrounded() && _moveDirection.y < 0f) 
@@ -130,14 +130,36 @@ public class PlayerController : MonoBehaviour
     {
         Vector3 upDir = Vector3.up;
         Vector3 sideDir = Vector3.Cross(climbNormal, Vector3.up).normalized;
+        Vector3 resultVelocity = Vector3.zero;
 
-        Vector3 upMovement = upDir * _moveDirection.y;
-        Vector3 rightMovement = sideDir * _moveDirection.x;
-        Vector3 climbDirection = upMovement + rightMovement;
+        if (Mathf.Abs(_moveDirection.y) > 0.1f)
+        {
+            Vector3 verticalMove = upDir * _moveDirection.y;
+            if (CanMoveInDirection(verticalMove))
+            {
+                resultVelocity += verticalMove * _moveSpeed;
+            }
+        }
 
-        _rigid.velocity = climbDirection * _moveSpeed;
+        if (Mathf.Abs(_moveDirection.x) > 0.1f)
+        {
+            Vector3 horizontalMove = sideDir * _moveDirection.x;
+            if (CanMoveInDirection(horizontalMove))
+            {
+                resultVelocity += horizontalMove * _moveSpeed;
+            }
+        }
 
-        if (IsGrounded())
+        
+        _rigid.velocity = resultVelocity;
+
+        if (IsWallFront())
+        {
+            movementState = Define.MovementState.Climbing;
+            Debug.Log("LeavingWall > Climb");
+        }
+        
+        else if (IsGrounded())
         {
             movementState = Define.MovementState.Normal;
             _rigid.useGravity = true;
@@ -259,11 +281,27 @@ public class PlayerController : MonoBehaviour
 
     private bool IsWallFront()
     {
-        return Physics.Raycast(transform.position + Vector3.up, transform.forward, wallCheckDistance, wallLayerMask);
+        if (Physics.Raycast(transform.position + Vector3.up, transform.forward, out RaycastHit hit, wallCheckDistance,
+                wallLayerMask))
+        {
+            climbNormal = hit.normal;
+            return true;
+        }
+
+        return false;
     }
     private bool CanClimbing()
     {
         return IsWallFront() && !IsGrounded();
+    }
+
+    private bool CanMoveInDirection(Vector3 direction)
+    {
+        Vector3 checkOrigin = transform.position + Vector3.up * 0.5f;
+        Vector3 nextPos = checkOrigin + direction.normalized * 0.3f;
+        bool isHit = Physics.Raycast(nextPos, -climbNormal, out RaycastHit hit, wallCheckDistance, wallLayerMask);
+        Debug.DrawRay(nextPos, -climbNormal * wallCheckDistance, isHit ? Color.green : Color.red, 0.1f);
+        return isHit;
     }
     
     private void ToggleCursor()
@@ -295,10 +333,12 @@ public class PlayerController : MonoBehaviour
             Gizmos.DrawRay(origin, direction);
         }
     }*/
+    
+    /*
     private void OnDrawGizmos()
     {
         Gizmos.color = canClimb ? Color.green : Color.red;
         Gizmos.DrawRay(transform.position, transform.forward * wallCheckDistance);
-    }
+    }*/
     #endregion
 }
