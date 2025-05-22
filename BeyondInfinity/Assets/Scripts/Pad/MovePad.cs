@@ -12,8 +12,6 @@ public class MovePad : MonoBehaviour
     
     [SerializeField] private int currentIndex = 0;
     private Vector3 destination;
-
-    private Vector3 platformVelocity;
     
     private Vector3 lastPosition;
     private Vector3 deltaPosition;

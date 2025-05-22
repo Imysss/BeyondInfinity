@@ -63,18 +63,12 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region Movement & Look
-    
-    public Vector3 platformVelocity = Vector3.zero;
     private void HandleMovement()
     {
         Vector3 inputDir = transform.forward * _moveDirection.y + transform.right * _moveDirection.x;
         Vector3 inputVelocity = inputDir * _moveSpeed;
-
-        // Final velocity = input + platform velocity
-        _rigid.velocity = new Vector3(inputVelocity.x + platformVelocity.x, _rigid.velocity.y, inputVelocity.z + platformVelocity.z);
-
-        // 마지막에 platformVelocity 리셋
-        platformVelocity = Vector3.zero;
+        
+        _rigid.velocity = new Vector3(inputVelocity.x, _rigid.velocity.y, inputVelocity.z);
     }
 
     private void RotateCamera()
