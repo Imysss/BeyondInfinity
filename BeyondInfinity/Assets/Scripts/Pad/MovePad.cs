@@ -12,8 +12,6 @@ public class MovePad : MonoBehaviour
     
     [SerializeField] private int currentIndex = 0;
     private Vector3 destination;
-    
-    private Vector3 lastPosition;
     private Vector3 deltaPosition;
 
     private void Awake()
@@ -25,7 +23,6 @@ public class MovePad : MonoBehaviour
     private void Start()
     {
         destination = moveDestination[currentIndex];
-        lastPosition = transform.position;
     }
 
     private void FixedUpdate()
@@ -42,7 +39,6 @@ public class MovePad : MonoBehaviour
 
         //실제 이동
         _rigid.position = nextPosition;
-        lastPosition = nextPosition;
         
         if (Vector3.Distance(transform.position, destination) < 0.01f)
         {

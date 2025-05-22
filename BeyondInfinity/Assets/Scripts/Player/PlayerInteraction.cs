@@ -9,7 +9,7 @@ public class PlayerInteraction : MonoBehaviour
 {
     [SerializeField] private float checkRate = 0.05f;
     private float _lastCheckTime;
-    [SerializeField] private float maxCheckDistance = 3f;
+    [SerializeField] private float maxCheckDistance = 5f;
     public LayerMask layerMask;
 
     private GameObject currentInteractGameObject;
@@ -73,5 +73,21 @@ public class PlayerInteraction : MonoBehaviour
         currentInteractGameObject = null;
         _currentInteractable = null;
         promptText.gameObject.SetActive(false);
+    }
+    
+    private void OnDrawGizmos()
+    {
+#if UNITY_EDITOR
+        if (_camera == null)
+            _camera = Camera.main;
+
+        if (_camera != null)
+        {
+            Gizmos.color = Color.yellow;
+            Vector3 rayOrigin = _camera.transform.position;
+            Vector3 rayDirection = _camera.transform.forward * maxCheckDistance;
+            Gizmos.DrawRay(rayOrigin, rayDirection);
+        }
+#endif
     }
 }
