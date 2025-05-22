@@ -30,6 +30,11 @@ public class PlayerController : MonoBehaviour
     private bool canLook = true;
     private CameraSwitcher _cameraSwitcher;
     
+    [Header("Climb")]
+    private float wallCheckDistance = 0.5f;
+    public LayerMask wallLayerMask;
+    private Vector3 climbNormal;
+    
     public Action OnInventoryChanged;
 
     #region Unity Methods
@@ -43,14 +48,6 @@ public class PlayerController : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         movementState =  Define.MovementState.Normal;
-    }
-
-    private void Update()
-    {
-        if (Time.time - _lastCheckTime > checkRate)
-        {
-            _lastCheckTime = Time.time;
-        }
     }
 
     private void FixedUpdate()
@@ -81,91 +78,71 @@ public class PlayerController : MonoBehaviour
     #region Movement & Look
     private void HandleMovement()
     {
-        Vector3 inputDir = transform.forward * _moveDirection.y + transform.right * _moveDirection.x;
-        Vector3 inputVelocity = inputDir * _moveSpeed;
-        
-        _rigid.velocity = new Vector3(inputVelocity.x, _rigid.velocity.y, inputVelocity.z);
+        ApplyHorizontalMovement();
 
         if (IsWallFront())
         {
-            movementState = Define.MovementState.Climbing;
-            _rigid.useGravity = false;
-            Debug.Log("Normal > Climb");
+            TransitionToClimb();
         }
     }
-
-    private Vector3 climbNormal;
+    
     private void HandleClimbMovement()
     {
-        _rigid.useGravity = false;
-        
         if (!IsWallFront() && !IsGrounded())
         {
-            movementState = Define.MovementState.LeavingWall;
-            Debug.Log("Climb > LeavingWall");
+            TransitionToLeavingWall();
             return;
         }
-        
-        //월드 기준 위/아래 방향
-        Vector3 upDir = Vector3.up;
-        Vector3 sideDir = Vector3.Cross(climbNormal, Vector3.up).normalized;
 
-        Vector3 upMovement = upDir * _moveDirection.y;
-        Vector3 rightMovement = sideDir * _moveDirection.x;
-        Vector3 climbDirection = upMovement + rightMovement;
+        Vector3 climbDir = GetClimbDirection(_moveDirection);
+        _rigid.velocity = climbDir * _moveSpeed;
         
-        _rigid.velocity = climbDirection * _moveSpeed;
-
         if (IsGrounded() && _moveDirection.y < 0f) 
         {
-            movementState = Define.MovementState.Normal;
-            _rigid.useGravity = true;
-            _rigid.velocity = Vector3.zero;
-            Debug.Log("Climb > Normal");
-            return;
+            TransitionToNormal();
         }
     }
 
     private void HandleLeavingWallMovement()
     {
-        Vector3 upDir = Vector3.up;
-        Vector3 sideDir = Vector3.Cross(climbNormal, Vector3.up).normalized;
-        Vector3 resultVelocity = Vector3.zero;
+        Vector3 movement = Vector3.zero;
 
         if (Mathf.Abs(_moveDirection.y) > 0.1f)
         {
-            Vector3 verticalMove = upDir * _moveDirection.y;
+            Vector3 verticalMove = Vector3.up * _moveDirection.y;
             if (CanMoveInDirection(verticalMove))
             {
-                resultVelocity += verticalMove * _moveSpeed;
+                movement += verticalMove * _moveSpeed;
             }
         }
 
+        Vector3 sideDir = Vector3.Cross(climbNormal, Vector3.up).normalized;
         if (Mathf.Abs(_moveDirection.x) > 0.1f)
         {
             Vector3 horizontalMove = sideDir * _moveDirection.x;
             if (CanMoveInDirection(horizontalMove))
             {
-                resultVelocity += horizontalMove * _moveSpeed;
+                movement += horizontalMove * _moveSpeed;
             }
         }
-
         
-        _rigid.velocity = resultVelocity;
+        _rigid.velocity = movement;
 
         if (IsWallFront())
         {
-            movementState = Define.MovementState.Climbing;
-            Debug.Log("LeavingWall > Climb");
+            TransitionToClimb();
         }
-        
         else if (IsGrounded())
         {
-            movementState = Define.MovementState.Normal;
-            _rigid.useGravity = true;
-            _rigid.velocity=Vector3.zero;
-            Debug.Log("LeavingWall > Normal");
+            TransitionToNormal();
         }
+    }
+
+    private void ApplyHorizontalMovement()
+    {
+        Vector3 inputDir = transform.forward * _moveDirection.y + transform.right * _moveDirection.x;
+        Vector3 inputVelocity = inputDir * _moveSpeed;
+        _rigid.velocity = new Vector3(inputVelocity.x, _rigid.velocity.y, inputVelocity.z);
     }
 
     private void RotateCamera()
@@ -175,6 +152,54 @@ public class PlayerController : MonoBehaviour
         
         cameraContainer.localEulerAngles = new Vector3(-_currentCameraXRotation, 0, 0);
         transform.eulerAngles += new Vector3(0, _mouseDelta.x * _lookSensitivity, 0);
+    }
+    #endregion
+
+    #region Climb Methods
+    private bool IsWallFront()
+    {
+        if (Physics.Raycast(transform.position + Vector3.up, transform.forward, out RaycastHit hit, wallCheckDistance,
+                wallLayerMask))
+        {
+            climbNormal = hit.normal;
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool CanMoveInDirection(Vector3 direction)
+    {
+        Vector3 checkOrigin = transform.position + Vector3.up * 0.5f;
+        Vector3 nextPos = checkOrigin + direction.normalized * 0.3f;
+        bool isHit = Physics.Raycast(nextPos, -climbNormal, out RaycastHit hit, wallCheckDistance, wallLayerMask);
+        Debug.DrawRay(nextPos, -climbNormal * wallCheckDistance, isHit ? Color.green : Color.red, 0.1f);
+        return isHit;
+    }
+
+    private Vector3 GetClimbDirection(Vector2 input)
+    {
+        Vector3 upDir = Vector3.up;
+        Vector3 sideDir = Vector3.Cross(climbNormal, upDir).normalized;
+        return (upDir * input.y + sideDir * input.x).normalized;
+    }
+
+    private void TransitionToClimb()
+    {
+        movementState = Define.MovementState.Climbing;
+        _rigid.useGravity = false;
+    }
+
+    private void TransitionToNormal()
+    {
+        movementState = Define.MovementState.Normal;
+        _rigid.useGravity = true;
+        _rigid.velocity=Vector3.zero;
+    }
+
+    private void TransitionToLeavingWall()
+    {
+        movementState = Define.MovementState.LeavingWall;
     }
     #endregion
 
@@ -272,37 +297,6 @@ public class PlayerController : MonoBehaviour
         revert();
     }
     #endregion
-
-    private float checkRate = 0.05f;
-    private float _lastCheckTime;
-    private float wallCheckDistance = 0.5f;
-    public LayerMask wallLayerMask;
-    public bool canClimb;
-
-    private bool IsWallFront()
-    {
-        if (Physics.Raycast(transform.position + Vector3.up, transform.forward, out RaycastHit hit, wallCheckDistance,
-                wallLayerMask))
-        {
-            climbNormal = hit.normal;
-            return true;
-        }
-
-        return false;
-    }
-    private bool CanClimbing()
-    {
-        return IsWallFront() && !IsGrounded();
-    }
-
-    private bool CanMoveInDirection(Vector3 direction)
-    {
-        Vector3 checkOrigin = transform.position + Vector3.up * 0.5f;
-        Vector3 nextPos = checkOrigin + direction.normalized * 0.3f;
-        bool isHit = Physics.Raycast(nextPos, -climbNormal, out RaycastHit hit, wallCheckDistance, wallLayerMask);
-        Debug.DrawRay(nextPos, -climbNormal * wallCheckDistance, isHit ? Color.green : Color.red, 0.1f);
-        return isHit;
-    }
     
     private void ToggleCursor()
     {
