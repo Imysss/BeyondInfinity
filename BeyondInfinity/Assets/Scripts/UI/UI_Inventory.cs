@@ -1,12 +1,8 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using UnityEditor.Timeline.Actions;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
-[Serializable]
 
 public class UI_Inventory : MonoBehaviour
 {
@@ -14,10 +10,6 @@ public class UI_Inventory : MonoBehaviour
     public GameObject slotPrefab;
     private GameObject inventoryWindow;
     private Transform slotContainer;
-
-    private List<ItemSlot> items;
-    
-    private Transform dropPosition;
 
     [Header("Select Item")] 
     private TextMeshProUGUI selectedItemNameText;
@@ -28,16 +20,21 @@ public class UI_Inventory : MonoBehaviour
     private GameObject equipButton;
     private GameObject unequipButton;
     private GameObject dropButton;
+    
+    private Transform dropPosition;
 
+    //Player Components
     private PlayerController controller;
     private PlayerCondition condition;
     private PlayerInteraction interaction;
     private PlayerInventory inventory;
 
+    //Inventory State
+    private List<ItemSlot> items;
     private ItemData selectedItem;
     private int selectedItemIndex = 0;
 
-
+    #region Unity Methods
     private void Start()
     {
         inventoryWindow = gameObject;
@@ -63,7 +60,9 @@ public class UI_Inventory : MonoBehaviour
         slotContainer.DestroyChildren();
         ClearSelectItemWindow();
     }
+    #endregion
 
+    #region UI Initialization
     private void InitUI()
     {
         selectedItemNameText = transform.Find("InfoBackground/ItemNameText").GetComponent<TextMeshProUGUI>();
@@ -91,7 +90,9 @@ public class UI_Inventory : MonoBehaviour
         //equipButton.GetComponent<Button>().onClick.AddListener(OnEquipButton);
         //unequipButton.GetComponent<Button>().onClick.AddListener(OnUnEquipButton);
     }
+    #endregion
 
+    #region Inventory Window Control
     private void Toggle()
     {
         if (IsOpen())
@@ -103,7 +104,12 @@ public class UI_Inventory : MonoBehaviour
             inventoryWindow.SetActive(true);
         }
     }
-
+    
+    private bool IsOpen()
+    {
+        return inventoryWindow.activeInHierarchy;
+    }
+    
     private void ClearSelectItemWindow()
     {
         selectedItemNameText.text = string.Empty;
@@ -116,12 +122,9 @@ public class UI_Inventory : MonoBehaviour
         unequipButton.SetActive(false);
         dropButton.SetActive(false);
     }
+    #endregion
 
-    private bool IsOpen()
-    {
-        return inventoryWindow.activeInHierarchy;
-    }
-
+    #region Inventory UI Refresh
     private void RefreshUI()
     {
         slotContainer.DestroyChildren();
@@ -158,7 +161,9 @@ public class UI_Inventory : MonoBehaviour
         unequipButton.SetActive(selectedItem.type == Define.ItemType.Equipable);
         dropButton.SetActive(true);
     }
+    #endregion
 
+    #region Item Interaction
     private void OnUseButton()
     {
         if (selectedItem.type != Define.ItemType.Consumable)
@@ -189,4 +194,5 @@ public class UI_Inventory : MonoBehaviour
         inventory.RemoveItem(selectedItem);
         ClearSelectItemWindow();
     }
+    #endregion
 }

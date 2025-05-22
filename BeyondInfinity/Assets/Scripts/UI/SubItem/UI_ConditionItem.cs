@@ -1,18 +1,18 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class UI_ConditionItem : MonoBehaviour
 {
+    //Value Fields
     public float currentValue;
     public float startValue;
     public float maxValue;
     public float passiveValue;
 
+    //UI Elements
     public Image uiBar;
 
+    #region Unity Methods
     private void Start()
     {
         currentValue = startValue;
@@ -22,12 +22,9 @@ public class UI_ConditionItem : MonoBehaviour
     {
         uiBar.fillAmount = GetPercentage();
     }
+    #endregion
 
-    private float GetPercentage()
-    {
-        return currentValue / maxValue;
-    }
-
+    #region Value Modification
     public void Add(float value)
     {
         currentValue = Mathf.Min(currentValue + value, maxValue);
@@ -37,4 +34,12 @@ public class UI_ConditionItem : MonoBehaviour
     {
         currentValue = Mathf.Max(currentValue - value, 0);
     }
+    #endregion
+
+    #region Utility
+    private float GetPercentage()
+    {
+        return currentValue / maxValue;
+    }
+    #endregion
 }

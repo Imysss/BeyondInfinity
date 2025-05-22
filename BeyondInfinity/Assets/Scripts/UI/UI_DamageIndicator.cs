@@ -7,15 +7,20 @@ using UnityEngine.UI;
 public class UI_DamageIndicator : MonoBehaviour
 {
     private Image _image;
+    
     private float _flashSpeed = 0.5f;
 
     private Coroutine _coroutine;
+
+    #region Unity Methods
     private void Start()
     {
         _image = GetComponent<Image>();
         PlayerManager.Instance.Player.condition.OnTakeDamage += Flash;
     }
+    #endregion
 
+    #region Flash Effect Methods
     private void Flash()
     {
         _image.enabled = true;
@@ -43,4 +48,5 @@ public class UI_DamageIndicator : MonoBehaviour
 
         _image.enabled = false;
     }
+    #endregion
 }

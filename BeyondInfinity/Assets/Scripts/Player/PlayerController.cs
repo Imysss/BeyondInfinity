@@ -1,10 +1,7 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting.Dependencies.NCalc;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -16,8 +13,6 @@ public class PlayerController : MonoBehaviour
     
     private Rigidbody _rigid;
     private Vector2 _moveDirection;
-
-    [NonSerialized] public Vector3 platformDelta = Vector3.zero;
     
     [Header("Jump")]
     private bool _isDoubleJumpEnabled;
@@ -81,7 +76,7 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
 
-    #region Player Input
+    #region Player Input Action
     private void OnMove(InputValue inputValue)
     {
         _moveDirection = inputValue.Get<Vector2>();
@@ -151,13 +146,6 @@ public class PlayerController : MonoBehaviour
         return false;
     }
     #endregion
-    
-    private void ToggleCursor()
-    {
-        bool toggle = Cursor.lockState == CursorLockMode.Locked;
-        Cursor.lockState = toggle ? CursorLockMode.None : CursorLockMode.Locked;
-        canLook = !toggle;
-    }
 
     #region Power-Up
     public void AddSpeed(float amount)
@@ -183,7 +171,14 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
     
-    private void OnDrawGizmosSelected()
+    private void ToggleCursor()
+    {
+        bool toggle = Cursor.lockState == CursorLockMode.Locked;
+        Cursor.lockState = toggle ? CursorLockMode.None : CursorLockMode.Locked;
+        canLook = !toggle;
+    }
+    
+    /*private void OnDrawGizmosSelected()
     {
         if (!Application.isPlaying) return;
 
@@ -203,5 +198,5 @@ public class PlayerController : MonoBehaviour
             Vector3 direction = Vector3.down * 0.2f;
             Gizmos.DrawRay(origin, direction);
         }
-    }
+    }*/
 }

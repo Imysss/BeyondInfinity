@@ -1,19 +1,18 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class MovePad : MonoBehaviour
 {
-    [SerializeField] private float moveSpeed;
+    [SerializeField] private float moveSpeed = 2f;
     [SerializeField] private Vector3[] moveDestination;
-    [SerializeField] private Rigidbody _player;
+    
+    private Rigidbody _player;
     private Rigidbody _rigid;
     
-    [SerializeField] private int currentIndex = 0;
     private Vector3 destination;
     private Vector3 deltaPosition;
+    private int currentIndex;
 
+    #region Unity Methods
     private void Awake()
     {
         _rigid = GetComponent<Rigidbody>();
@@ -29,7 +28,17 @@ public class MovePad : MonoBehaviour
     {
         MoveToDestination();
     }
+    
+    private void OnCollisionStay(Collision other)
+    {
+        if (other.gameObject.TryGetComponent(out _player))
+        {
+            _player.position += deltaPosition;
+        }
+    }
+    #endregion
 
+    #region Movement Logic
     private void MoveToDestination()
     {
         Vector3 nextPosition = Vector3.MoveTowards(_rigid.position, destination, moveSpeed * Time.fixedDeltaTime);
@@ -46,12 +55,5 @@ public class MovePad : MonoBehaviour
             destination = moveDestination[currentIndex];
         }
     }
-    
-    private void OnCollisionStay(Collision other)
-    {
-        if (other.gameObject.TryGetComponent(out _player))
-        {
-            _player.position += deltaPosition;
-        }
-    }
+    #endregion
 }

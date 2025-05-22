@@ -1,16 +1,16 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
-using UnityEditor.UIElements;
 using UnityEngine;
 
 public class PlayerInventory : MonoBehaviour
 {
+    //Events
     public Action OnInventoryChanged;
 
+    //Inventory Data
     public List<ItemSlot> items = new List<ItemSlot>();
 
+    #region Item Management Methods
     public void AddItem(ItemData data)
     {
         ItemSlot slot = items.Find(slot =>
@@ -44,4 +44,5 @@ public class PlayerInventory : MonoBehaviour
         
         OnInventoryChanged?.Invoke();
     }
+    #endregion
 }

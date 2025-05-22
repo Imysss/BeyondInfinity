@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -20,7 +17,8 @@ public class PlayerInteraction : MonoBehaviour
     public Transform dropPosition;
     
     private Camera _camera;
-    
+
+    #region Unity Methods
     private void Start()
     {
         _camera = Camera.main;
@@ -31,25 +29,31 @@ public class PlayerInteraction : MonoBehaviour
         if (Time.time - _lastCheckTime > checkRate)
         {
             _lastCheckTime = Time.time;
+            PerformRaycast();
+        }
+    }
+    #endregion
 
-            Ray ray = _camera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f));
-            RaycastHit hit;
+    #region Interaction Logic
+    private void PerformRaycast()
+    {
+        Ray ray = _camera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f));
+        RaycastHit hit;
 
-            if (Physics.Raycast(ray, out hit, maxCheckDistance, layerMask))
+        if (Physics.Raycast(ray, out hit, maxCheckDistance, layerMask))
+        {
+            if (hit.collider.gameObject != currentInteractGameObject)
             {
-                if (hit.collider.gameObject != currentInteractGameObject)
+                currentInteractGameObject = hit.collider.gameObject;
+                if (hit.collider.TryGetComponent<IInteractable>(out _currentInteractable))
                 {
-                    currentInteractGameObject = hit.collider.gameObject;
-                    if (hit.collider.TryGetComponent<IInteractable>(out _currentInteractable))
-                    {
-                        DisplayPromptText();
-                    }
+                    DisplayPromptText();
                 }
             }
-            else
-            {
-                ClearInteraction();
-            }
+        }
+        else
+        {
+            ClearInteraction();
         }
     }
 
@@ -59,6 +63,15 @@ public class PlayerInteraction : MonoBehaviour
         promptText.text = _currentInteractable.GetInteractPrompt();
     }
 
+    private void ClearInteraction()
+    {
+        currentInteractGameObject = null;
+        _currentInteractable = null;
+        promptText.gameObject.SetActive(false);
+    }
+    #endregion
+
+    #region Player Input Action
     private void OnInteract(InputValue inputValue)
     {
         if (_currentInteractable != null)
@@ -67,15 +80,10 @@ public class PlayerInteraction : MonoBehaviour
             ClearInteraction();
         }
     }
+    #endregion
 
-    private void ClearInteraction()
-    {
-        currentInteractGameObject = null;
-        _currentInteractable = null;
-        promptText.gameObject.SetActive(false);
-    }
-    
-    private void OnDrawGizmos()
+    #region Gizmos
+    /*private void OnDrawGizmos()
     {
 #if UNITY_EDITOR
         if (_camera == null)
@@ -89,5 +97,6 @@ public class PlayerInteraction : MonoBehaviour
             Gizmos.DrawRay(rayOrigin, rayDirection);
         }
 #endif
-    }
+    }*/
+    #endregion
 }

@@ -1,20 +1,21 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerCondition : MonoBehaviour, IDamageable
 {
+    //UI Binding
     public UI_Condition uiCondition;
-    
     UI_ConditionItem health { get { return uiCondition.Health; } }
     UI_ConditionItem hunger { get { return uiCondition.Hunger; } }
     UI_ConditionItem stamina { get { return uiCondition.Stamina; } }
 
+    //Config
     private float _noHungerHealthDecay = 2f;    //배고픔이 0이 되면 줄어들 체력의 수
 
+    //Events
     public event Action OnTakeDamage;
-    
+
+    #region Unity Methods
     private void Update()
     {
         //hunger.Subtract(hunger.passiveValue * Time.deltaTime);
@@ -30,7 +31,9 @@ public class PlayerCondition : MonoBehaviour, IDamageable
             OnDead();
         }
     }
+    #endregion
 
+    #region Condition Methods
     public void Heal(float amount)
     {
         health.Add(amount);
@@ -59,7 +62,8 @@ public class PlayerCondition : MonoBehaviour, IDamageable
     {
         health.Subtract(damage);
     }
-
+    #endregion
+    
     public void OnDead()
     {
         Debug.Log("Player Dead");

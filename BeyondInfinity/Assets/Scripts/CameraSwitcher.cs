@@ -1,19 +1,16 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraSwitcher : MonoBehaviour
 {
-    [SerializeField]
-    private Transform firstPersonPivot;
-    [SerializeField]
-    private Transform thirdPersonPivot;
-    [SerializeField]
-    private Transform cameraTransform;
+    //Camera Pivots and Transform
+    [SerializeField] private Transform firstPersonPivot;
+    [SerializeField] private Transform thirdPersonPivot;
+    [SerializeField] private Transform cameraTransform;
 
+    //Camera State
     private bool isFirstPersonPerspective;
 
+    #region Unity Methods
     private void Start()
     {
         firstPersonPivot = transform.Find("FirstPersonPivot");
@@ -22,7 +19,9 @@ public class CameraSwitcher : MonoBehaviour
         isFirstPersonPerspective = true;
         ChangeView();
     }
+    #endregion
 
+    #region View Switching Logic
     public void SwitchView()
     {
         isFirstPersonPerspective = !isFirstPersonPerspective;
@@ -34,4 +33,5 @@ public class CameraSwitcher : MonoBehaviour
         Transform targetPivot = isFirstPersonPerspective ? firstPersonPivot : thirdPersonPivot;
         cameraTransform.position = targetPivot.position;
     }
+    #endregion
 }
